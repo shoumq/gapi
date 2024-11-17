@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"gapi/pkg/handlers"
+	"gapi/internal/handlers"
 	"gapi/pkg/repositories"
 	"gapi/pkg/services"
 	"github.com/gorilla/mux"
