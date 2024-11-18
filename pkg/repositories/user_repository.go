@@ -66,7 +66,7 @@ func (r *UserRepository) GetByID(id int) (models.User, error) {
 	var user models.User
 
 	query := `SELECT * FROM users WHERE id = $1`
-	err := r.db.QueryRow(query, id).Scan(&user.ID, &user.Name, &user.Email, &user.Password)
+	err := r.db.QueryRow(query, id).Scan(&user.ID, &user.Name, &user.Email, &user.Password, &user.Admin)
 	if err != nil {
 		return models.User{}, err
 	}
@@ -89,7 +89,7 @@ func (r *UserRepository) GetAll() ([]models.User, error) {
 
 	for rows.Next() {
 		var user models.User
-		err = rows.Scan(&user.ID, &user.Name, &user.Email, &user.Password)
+		err = rows.Scan(&user.ID, &user.Name, &user.Email, &user.Password, &user.Admin)
 		if err != nil {
 			return nil, err
 		}
@@ -130,4 +130,21 @@ func (r *UserRepository) Update(id int, user models.User) (models.User, error) {
 	}
 
 	return updatedUser, nil
+}
+
+func (r *UserRepository) setAdminStatus(id int, isAdmin bool) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	query := "UPDATE users SET is_admin = $1 WHERE id = $2"
+	_, err := r.db.Exec(query, isAdmin, id)
+	return err
+}
+
+func (r *UserRepository) AddAdmin(id int) error {
+	return r.setAdminStatus(id, true)
+}
+
+func (r *UserRepository) DelAdmin(id int) error {
+	return r.setAdminStatus(id, false)
 }

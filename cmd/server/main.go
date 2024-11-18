@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 	"gapi/internal/handlers"
+	"gapi/internal/middlewares"
 	"gapi/pkg/repositories"
 	"gapi/pkg/services"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
-	"log"
 	"net/http"
 )
 
@@ -29,6 +29,14 @@ func main() {
 		handlers.PostUserHandler(w, r, userService)
 	}).Methods("POST")
 
+	router.HandleFunc("/users/{id}/add_admin", func(w http.ResponseWriter, r *http.Request) {
+		handlers.AddAdminHandler(w, r, userService)
+	}).Methods("POST")
+
+	router.HandleFunc("/users/{id}/del_admin", func(w http.ResponseWriter, r *http.Request) {
+		handlers.DelAdminHandler(w, r, userService)
+	}).Methods("POST")
+
 	router.HandleFunc("/users/{id}", func(w http.ResponseWriter, r *http.Request) {
 		handlers.DeleteUserHandler(w, r, userService)
 	}).Methods("DELETE")
@@ -37,10 +45,11 @@ func main() {
 		handlers.UpdateUserHandler(w, r, userService)
 	}).Methods("PATCH")
 
-	http.Handle("/", router)
+	router.Handle("/admin", middlewares.AdminMiddleware(http.HandlerFunc(handlers.AdminHandler)))
 
-	fmt.Println("Server is running on port 8080...")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		log.Fatal(err)
-	}
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "Welcome to the home page!")
+	})
+
+	http.ListenAndServe(":8080", router)
 }

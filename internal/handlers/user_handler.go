@@ -108,3 +108,35 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request, userService *serv
 		return
 	}
 }
+
+func AddAdminHandler(w http.ResponseWriter, r *http.Request, userService *services.UserService) {
+	vars := mux.Vars(r)
+	idStr := vars["id"]
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Invalid ID", http.StatusBadRequest)
+	}
+
+	err = userService.AddAdmin(id)
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func DelAdminHandler(w http.ResponseWriter, r *http.Request, userService *services.UserService) {
+	vars := mux.Vars(r)
+	idStr := vars["id"]
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Invalid ID", http.StatusBadRequest)
+	}
+
+	err = userService.DelAdmin(id)
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func AdminHandler(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("Welcome to the admin area!"))
+}

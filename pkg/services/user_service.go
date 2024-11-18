@@ -69,3 +69,19 @@ func (s *UserService) UpdateUserById(id int, req *UserRequest) (*models.User, er
 	}
 	return &updatedUser, nil
 }
+
+func (s *UserService) AddAdmin(id int) error {
+	err := s.repo.AddAdmin(id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *UserService) DelAdmin(id int) error {
+	err := s.repo.DelAdmin(id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
